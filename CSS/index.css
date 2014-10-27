@@ -1,0 +1,74 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 2014-6-26, 14:07:36
+    Author     : GisMan
+*/
+
+#head{
+    background-color: #69F;
+    height:100px;
+}
+#accordion{
+    position: relative;
+    top: auto;
+    width: 25%;
+}
+#title_img{
+    position: absolute;
+    top: 3%;
+}
+#area_clean_button{
+    position: relative;
+    bottom: 0;
+    left: 25%;
+}
+
+#menu{
+    position: absolute;
+    right: 5%;
+    top: 10%;
+}
+
+#picture{
+    position: absolute;
+    top: 15%;
+    right:35.7%;
+    display: none;
+}
+
+/*#about{
+    position: absolute;
+    top: 3%;
+    right:1%;
+    display: none;
+}*/
+
+#login{
+    position: absolute;
+    top: 3%;
+    right:1%; 
+}
+
+#exit{
+    position: absolute;
+    top: 3%;
+    right:1%; 
+}
+
+#bar{
+    position: absolute;
+    bottom: 3%;
+    right:25%; 
+}
+
+.admin_table,.admin_history_table{
+    display: none;
+}
+
+#login_button{
+    background:url(IMG/admin.png);
+} 

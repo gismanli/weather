@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="JS/jQuery/jquery-2.0.3.min.js"></script>
+        <style type="text/css">
+            body{
+                /*background-color: #eee;*/
+                background-image: url(IMG/bac.png);
+                background-attachment: fixed;
+                background-repeat: no-repeat;
+                background-size: 100% 100%;
+            }
+            #Enter{
+                font-family: fantasy;
+                font-size: x-large;
+                width: 400px;
+                height: 80px;
+            }
+            #container{
+                position: absolute;
+                top: 60%;
+                right:10%
+            }
+            #Enter{
+                width:220px;
+                height:50px;
+                -webkit-border-radius:15px;
+                -moz-border-radius:15px;
+                margin:4px 0 0 10px;
+                background-color: #1c94c4
+            } 
+            #about{
+                position: absolute;
+                right: 1%;
+                width: 250px;
+                display: none;
+                background-image: url(IMG/button.gif);
+            }
+            #about_button{
+                position: absolute;
+                right: 0%;
+                width:16px;
+                height:16px;
+                background-image: url(IMG/about.gif);
+            } 
+        </style>
+        <script type="text/javascript">
+            function about() {
+                if ($("#about").css("display") == "none")
+                    $("#about").css("display", "block");
+                else
+                    $("#about").css("display", "none");
+            }
+            function index() {
+                window.location.href = 'main.html';
+            }
+        </script>
+    </head>
+    <body>
+        <div id="container" >
+            <button  id="Enter" onclick="index();">Enter</button><br>
+        </div>
+        <div id="about_button" onclick="about();"></div>
+        <div id="about">
+            <b>
+                作品名称：湖南省气象服务系统<br>
+                组长：李俚<br>
+                组员：杨雨诚 谢育武<br>
+                指导老师：邹艳红<br>
+                团队编号：1200527<br>
+                学校：中南大学
+            </b>
+        </div>
+    </body>
+</html>

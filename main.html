@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="CSS/index.css">
+        <!--<link rel="stylesheet" href="jQuery/css/ui-lightness/jquery-ui-1.10.4.css">-->
+        <link rel="stylesheet" href="JS/jQuery/css/redmond/jquery-ui-1.10.4.custom.min.css">
+        <script src="JS/jQuery/jquery-2.0.3.min.js"></script>
+        <script src="JS/jQuery/jquery-ui-1.10.4.min.js"></script>
+        <script src ="JS/JSCharts/jscharts.js"></script>
+        <script src="JS/SuperMap/libs/SuperMap.Include.js"></script>
+        <script src="JS/SuperMap/libs/SuperMap-7.0-178.js"></script>
+        <script src ="JS/Init.js"></script>
+        <script src ="JS/Map.js"></script>
+        <script src="JS/Connect.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $(function() {
+                    $("#exit").css("display", "none");
+                    $("#accordion").accordion();
+                    $("#menu").buttonset();
+                    $("#tabs").tabs();
+                    $("#dialog_table").dialog({
+                        autoOpen: false,
+                        height: 400,
+                        width: 520,
+                        resizable: false,
+                        show: {
+                        },
+                        hide: {
+                            effect: "fold",
+                            duration: 1000
+                        }
+                    });
+                    $("#dialog_table_station").dialog({
+                        autoOpen: false,
+                        height: 300,
+                        width: 550,
+                        resizable: false,
+                        show: {
+                        },
+                        hide: {
+                            effect: "fold",
+                            duration: 1000
+                        }
+//                    modal: true
+                    });
+                    $("#dialog_select").dialog({
+                        autoOpen: false,
+                        height: 90,
+                        width: 380,
+                        resizable: false,
+                        position: [800, 120]
+                    });
+                    $("#dialog_chart").dialog({
+                        autoOpen: false,
+                        height: 420,
+                        width: 800,
+                        resizable: false
+                    });
+                    $("#dialog_chart_all").dialog({
+                        autoOpen: false,
+                        height: 420,
+                        width: 800,
+                        resizable: false
+                    });
+                    $("#login_dialog").dialog({
+                        autoOpen: false,
+                        height: 150,
+                        width: 220,
+                        resizable: false
+                    });
+                    $("#dynamic").dialog({
+                        autoOpen: false,
+                        height: 180,
+                        width: 300,
+                        resizable: false,
+                        position: [25, 420]
+                    });
+                    $("#tools_dialog").dialog({
+                        autoOpen: false,
+                        height: 80,
+                        width: 300,
+                        resizable: false,
+                        position: [25, 420]
+                    });
+                    $("#admin_data").dialog({
+                        autoOpen: false,
+                        height: 430,
+                        width: 180,
+                        resizable: false
+                    });
+                    $("#admin_history").dialog({
+                        autoOpen: false,
+                        height: 300,
+                        width: 180,
+                        resizable: false
+                    });
+                    $("#search_dialog").dialog({
+                        autoOpen: false,
+                        height: 80,
+                        width: 300,
+                        resizable: false,
+                        position: [25, 420]
+                    });
+                    $("#temp_pie").dialog({
+                        autoOpen: false,
+                        height: 400,
+                        width: 400,
+                        resizable: false
+                    });
+                    $("#original,#level,#rain").button().click(function() {
+                        _addimage(this.value.toString() * 1);
+                        $("#picture").css("display", "none");
+                    });
+                    $("#temperature_map,#rain_pie,#rain_bar,#rain_count,#area_map_button,#area_list_button,#area_clean_button,#start_dynamic,#end_dynamic,#admin_change,#admin_history_change").button();
+                });
+                $("#radio1").click(function() {
+                    if ($("#picture").is(":visible") === true)
+                        $("#picture").css("display", "none");
+                    else
+                        $("#picture").css("display", "block");
+                });
+                $("#radio2").click(function() {
+                    connect("TestServlet", {
+                        type: "USER_SEARCH_STATION"
+                    }, function(e) {
+                        var dataarr1 = eval("(" + e + ")");
+                        var dataarr2 = JSON.stringify(dataarr1.geometries).replace("[{", "{");
+                        var dataarr3 = dataarr2.replace("}]", "}");
+                        var dataarr4 = dataarr3.replace(/\},{/g, "},,{");
+                        var jsonarr = dataarr4.split(",,");
+                        var count = dataarr1.count;
+                        _update_station_all(jsonarr, count);
+                        $("#dialog_table").dialog("open");
+                    }, null);
+                });
+                $("#radio3").click(function() {
+                    $("#dialog_chart_all").dialog("open");
+                });
+                $("#radio4").click(function() {
+                    $("#dynamic").dialog("open");
+                });
+                $("#radio5").click(function() {
+                    $("#dialog_select").dialog("open");
+                    $("#select_box").click(function() {
+                        _selectfeature("box");
+                    });
+                    $("#select_polygon").click(function() {
+                        _selectfeature("polygon");
+                    });
+                    $("#select_name").click(function() {
+                        $("#search_dialog").dialog("open");
+                    });
+                    $("#select_bounds").click(function() {
+                        _getbounds();
+                    });
+                });
+                $("#login").click(function() {
+                    $("#login_dialog").dialog("open");
+                });
+                $("#area_map_button").click(function() {
+                    if ($("#all").is(":checked") === true) {
+                        connect("TestServlet", {
+                            type: "USER_SEARCH_STATION"
+                        }, function(data) {
+                            var dataarr1 = eval("(" + data + ")");
+                            var dataarr2 = JSON.stringify(dataarr1.geometries).replace("[{", "{");
+                            var dataarr3 = dataarr2.replace("}]", "}");
+                            var dataarr4 = dataarr3.replace(/\},{/g, "},,{");
+                            var jsonarr = dataarr4.split(",,");
+                            var count = dataarr1.count;
+                            _refresh(jsonarr, count);
+                        }, null);
+                        return;
+                    } else if ($("#all").is(":checked") === false) {
+                        var city = "城市名";
+                        for (n = 1; n < 15; n++) {
+                            if ($("#city" + n).is(":checked") === true)
+                                city = city + "," + $("#city" + n).val();
+                        }
+                        connect("TestServlet", {
+                            type: "USER_SEARCH_DATA",
+                            data: city
+                        }, function(data) {
+                            var dataarr1 = eval("(" + data + ")");
+                            var dataarr2 = JSON.stringify(dataarr1.geometries).replace("[{", "{");
+                            var dataarr3 = dataarr2.replace("}]", "}");
+                            var dataarr4 = dataarr3.replace(/\},{/g, "}_{");
+                            var jsonarr = dataarr4.split("_");
+                            var count = dataarr1.count;
+                            _refresh(jsonarr, count);
+                        }, null);
+                    }
+                });
+                $("#area_clean_button,#rain_clean").click(function() {
+                    _delete();
+                });
+                $("#area_list_button").click(function() {
+                    if ($("#all").is(":checked") === true) {
+                        connect("TestServlet", {
+                            type: "USER_SEARCH_STATION"
+                        }, function(data) {
+                            var dataarr1 = eval("(" + data + ")");
+                            var dataarr2 = JSON.stringify(dataarr1.geometries).replace("[{", "{");
+                            var dataarr3 = dataarr2.replace("}]", "}");
+                            var dataarr4 = dataarr3.replace(/\},{/g, "},,{");
+                            var jsonarr = dataarr4.split(",,");
+                            var count = dataarr1.count;
+//                            alert(dataarr3.toString());
+                            _update_station(jsonarr, count);
+                            $("#dialog_table_station").dialog("open");
+                        }, null);
+                        return;
+                    } else if ($("#all").is(":checked") === false) {
+                        var city = "城市名";
+                        for (n = 1; n < 15; n++) {
+                            if ($("#city" + n).is(":checked") === true)
+                                city = city + "," + $("#city" + n).val();
+                        }
+                        connect("TestServlet", {
+                            type: "USER_SEARCH_DATA",
+                            data: city
+                        }, function(data) {
+                            var dataarr1 = eval("(" + data + ")");
+                            var dataarr2 = JSON.stringify(dataarr1.geometries).replace("[{", "{");
+                            var dataarr3 = dataarr2.replace("}]", "}");
+                            var dataarr4 = dataarr3.replace(/\},{/g, "}_{");
+                            var jsonarr = dataarr4.split("_");
+                            var count = dataarr1.count;
+//                            alert(dataarr3.toString());
+                            _update_station(jsonarr, count);
+                            $("#dialog_table_station").dialog("open");
+                        }, null);
+                    }
+//                    _update();
+                });
+                $("#temperature_map").click(function() {
+                    setTemperature();
+                });
+                $("#tools").click(function() {
+                    $("#tools_dialog").dialog("open");
+                });
+                $("#rain_bar").click(function() {
+                    connect("TestServlet", {
+                        type: "USER_SEARCH_TEMPERATURE",
+                        data: {
+                            city: "全部",
+                            month: $("#month").val().toString(),
+                            day: $("#day").val().toString(),
+                            hour: $("#hour").val().toString()
+                        }
+                    }, function(data) {
+                        var dataarr1 = eval("(" + data + ")");
+                        var dataarr2 = JSON.stringify(dataarr1.geometries).replace("[{", "{");
+                        var dataarr3 = dataarr2.replace("}]", "}");
+                        var dataarr4 = dataarr3.replace(/\},{/g, "},,{");
+                        var json = dataarr4.split(",,");
+                        var count = dataarr1.count;
+                        if (count == 0) {
+                            alert("数据查询为空，请重新选择日期！");
+                            return;
+                        }
+                        createHeatPoints(json, count);
+                    }, null);
+                });
+                $("#city").change(function() {
+                    if ($("#city").val() === "查看全部") {
+                        $("#country").html("");
+                        $("#country").append("<option value=''>查看全部县</option>");
+                        return;
+                    } else if ($("#city").val() === "长沙市") {
+                        $("#country").html("");
+                        $("#country").append("<option value='长沙'>长沙市市辖区</option>");
+                        $("#country").append("<option value='望城'>望城县</option>");
+                        $("#country").append("<option value='宁乡'>宁乡县</option>");
+                        $("#country").append("<option value='浏阳'>浏阳市</option>");
+                        return;
+                    } else if ($("#city").val() === "株洲市") {
+                        $("#country").html("");
+                        $("#country").append("<option value='株洲'>株洲市市辖区</option>");
+                        $("#country").append("<option value='攸县'>攸县</option>");
+                        $("#country").append("<option value='茶陵'>茶陵县</option>");
+                        $("#country").append("<option value='炎陵'>炎陵县</option>");
+                        $("#country").append("<option value='醴陵'>醴陵市</option>");
+                        return;
+                    } else if ($("#city").val() === "湘潭市") {
+                        $("#country").html("");
+                        $("#country").append("<option value='湘潭'>湘潭市市辖区</option>");
+                        $("#country").append("<option value='湘乡'>湘乡市</option>");
+                        $("#country").append("<option value='韶山'>韶山市</option>");
+                        return;
+                    } else if ($("#city").val() === "衡阳市") {
+                        $("#country").html("");
+                        $("#country").append("<option value='衡阳'>衡阳市市辖区</option>");
+                        $("#country").append("<option value='衡南'>衡南县</option>");
+                        $("#country").append("<option value='衡山'>衡山县</option>");
+                        $("#country").append("<option value='衡东'>衡东县</option>");
+                        $("#country").append("<option value='祁东'>祁东县</option>");
+                        $("#country").append("<option value='耒阳'>耒阳市</option>");
+                        $("#country").append("<option value='常宁'>常宁市</option>");
+                        return;
+                    } else if ($("#city").val() === "邵阳市") {
+                        $("#country").html("");
+                        $("#country").append("<option value='邵阳'>邵阳市市辖区</option>");
+                        $("#country").append("<option value='邵东'>邵东县</option>");
+                        $("#country").append("<option value='新邵'>新邵县</option>");
+                        $("#country").append("<option value='隆回'>隆回县</option>");
+                        $("#country").append("<option value='洞口'>洞口县</option>");
+                        $("#country").append("<option value='绥宁'>绥宁县</option>");
+                        $("#country").append("<option value='新宁'>新宁县</option>");
+                        $("#country").append("<option value='武冈'>武冈市</option>");
+                        return;
+                    } else if ($("#city").val() === "岳阳市") {
+                        $("#country").html("");
+                        $("#country").append("<option value='岳阳'>岳阳市市辖区</option>");
+                        $("#country").append("<option value='岳阳'>岳阳县</option>");
+                        $("#country").append("<option value='华容'>华容县</option>");
+                        $("#country").append("<option value='湘阴'>湘阴县</option>");
+                        $("#country").append("<option value='平江'>平江县</option>");
+                        $("#country").append("<option value='汨罗'>汨罗市</option>");
+                        $("#country").append("<option value='临湘'>临湘市</option>");
+                        return;
+                    } else if ($("#city").val() === "常德市") {
+                        $("#country").html("");
+                        $("#country").append("<option value='常德'>常德市市辖区</option>");
+                        $("#country").append("<option value='安乡'>安乡县</option>");
+                        $("#country").append("<option value='汉寿'>汉寿县</option>");
+                        $("#country").append("<option value='澧县'>澧县</option>");
+                        $("#country").append("<option value='临澧'>临澧县</option>");
+                        $("#country").append("<option value='桃源'>桃源县</option>");
+                        $("#country").append("<option value='石门'>石门县</option>");
+                        $("#country").append("<option value='津市'>津市市</option>");
+                        return;
+                    } else if ($("#city").val() === "张家界市") {
+                        $("#country").html("");
+                        $("#country").append("<option value='张家界'>张家界市市辖区</option>");
+                        $("#country").append("<option value='慈利'>慈利县</option>");
+                        $("#country").append("<option value='桑植'>桑植县</option>");
+                        return;
+                    } else if ($("#city").val() === "益阳市") {
+                        $("#country").html("");
+                        $("#country").append("<option value='益阳'>益阳市市辖区</option>");
+                        $("#country").append("<option value='南县'>南县</option>");
+                        $("#country").append("<option value='桃江'>桃江县</option>");
+                        $("#country").append("<option value='安化'>安化县</option>");
+                        $("#country").append("<option value='沅江'>沅江县</option>");
+                        return;
+                    } else if ($("#city").val() === "郴州市") {
+                        $("#country").html("");
+                        $("#country").append("<option value='益阳'>益阳市市辖区</option>");
+                        $("#country").append("<option value='桂阳'>桂阳县</option>");
+                        $("#country").append("<option value='宜章'>宜章县</option>");
+                        $("#country").append("<option value='永兴'>永兴县</option>");
+                        $("#country").append("<option value='嘉禾'>嘉禾县</option>");
+                        $("#country").append("<option value='临武'>临武县</option>");
+                        $("#country").append("<option value='汝城'>汝城县</option>");
+                        $("#country").append("<option value='桂东'>桂东县</option>");
+                        $("#country").append("<option value='安仁'>安仁县</option>");
+                        $("#country").append("<option value='资兴'>资兴市</option>");
+                        return;
+                    } else if ($("#city").val() === "永州市") {
+                        $("#country").html("");
+                        $("#country").append("<option value='永州'>永州市市辖区</option>");
+                        $("#country").append("<option value='祁阳'>祁阳县</option>");
+                        $("#country").append("<option value='安东'>安东县</option>");
+                        $("#country").append("<option value='双牌'>双牌县</option>");
+                        $("#country").append("<option value='道县'>道县</option>");
+                        $("#country").append("<option value='江永'>江永县</option>");
+                        $("#country").append("<option value='宁远'>宁远县</option>");
+                        $("#country").append("<option value='蓝山'>蓝山县</option>");
+                        $("#country").append("<option value='新田'>新田县</option>");
+                        $("#country").append("<option value='江华'>江华瑶族自治县</option>");
+                        return;
+                    } else if ($("#city").val() === "怀化市") {
+                        $("#country").html("");
+                        $("#country").append("<option value='怀化'>怀化市市辖区</option>");
+                        $("#country").append("<option value='中方'>中方县</option>");
+                        $("#country").append("<option value='沅陵'>沅陵县</option>");
+                        $("#country").append("<option value='辰溪'>辰溪县</option>");
+                        $("#country").append("<option value='溆浦'>溆浦县</option>");
+                        $("#country").append("<option value='会同'>会同县</option>");
+                        $("#country").append("<option value='麻阳'>麻阳苗族自治县</option>");
+                        $("#country").append("<option value='新晃'>新晃侗族自治县</option>");
+                        $("#country").append("<option value='芷江'>芷江侗族自治县</option>");
+                        $("#country").append("<option value='靖州'>靖州苗族侗族自治县</option>");
+                        $("#country").append("<option value='通道'>通道侗族自治县</option>");
+                        $("#country").append("<option value='洪江'>洪江市</option>");
+                        return;
+                    } else if ($("#city").val() === "娄底市") {
+                        $("#country").html("");
+                        $("#country").append("<option value='娄底'>娄底市市辖区</option>");
+                        $("#country").append("<option value='双峰'>双峰县</option>");
+                        $("#country").append("<option value='新化'>新化县</option>");
+                        $("#country").append("<option value='冷水江'>冷水江市</option>");
+                        $("#country").append("<option value='涟源'>涟源市</option>");
+                        return;
+                    } else if ($("#city").val() === "湘西") {
+                        $("#country").html("");
+                        $("#country").append("<option value='吉首'>吉首市</option>");
+                        $("#country").append("<option value='泸西'>泸西县</option>");
+                        $("#country").append("<option value='凤凰'>凤凰县</option>");
+                        $("#country").append("<option value='花垣'>花垣县</option>");
+                        $("#country").append("<option value='保靖'>保靖县</option>");
+                        $("#country").append("<option value='古丈'>古丈县</option>");
+                        $("#country").append("<option value='永顺'>永顺县</option>");
+                        $("#country").append("<option value='龙山'>龙山县</option>");
+                        return;
+                    }
+                });
+            });</script>
+    </head>
+    <body onload="init()" style="font-size: 80%">
+        <div  id ="head">
+            <img src="IMG/img.png" id="title_img" alt="湖南首气象服务平台"/>
+            <input type="hidden" id ="session_password"/>      
+        </div>
+        <div id="map" style="position: absolute;width: 74%;height: 82%;right:0px;bottom: 0px;top:17%"></div>
+        <div id="accordion">
+            <h3>按市区查看天气</h3>
+            <div style="padding-bottom: 10%;padding-top: 5%;">
+                <input type="checkbox" id="all" checked="checked" value="全部"/>全部
+                <input type="checkbox" id="city1" value="长沙市"/>长沙
+                <input type="checkbox" id="city2" value="株洲市"/>株洲
+                <input type="checkbox" id="city3" value="湘潭市"/>湘潭
+                <input type="checkbox" id="city4" value="衡阳市"/>衡阳
+                <input type="checkbox" id="city5" value="邵阳市"/>邵阳
+                <input type="checkbox" id="city6" value="岳阳市"/>岳阳
+                <input type="checkbox" id="city7" value="常德市"/>常德
+                <input type="checkbox" id="city8" value="益阳市"/>益阳
+                <input type="checkbox" id="city9" value="郴州市"/>郴州
+                <input type="checkbox" id="city10" value="永州市"/>永州
+                <input type="checkbox" id="city11" value="怀化市"/>怀化
+                <input type="checkbox" id="city12" value="娄底市"/>娄底
+                <input type="checkbox" id="city13" value="湘西"/>湘西
+                <input type="checkbox" id="city14" value="张家界市"/>张家界
+                <br><br>
+                <button id="area_map_button">在地图中标记</button>
+                <button id="area_list_button">在列表中显示</button>
+                <br><br>
+                <button id="area_clean_button">清除所有标记</button>
+            </div>
+            <h3>按时间查看温度</h3>
+            <div>
+                <b>月:</b>
+                <select name="spinner" id="month">
+                    <option value="Jan">一</option>
+                    <option value="Feb">二</option>
+                    <option value="Mar">三</option>
+                    <option value="Apr">四</option>
+                    <option value="May">五</option>
+                    <option value="Jun">六</option>
+                    <option value="Jul">七</option>
+                    <option value="Aug">八</option>
+                    <option value="Sep">九</option>
+                    <option value="Oct">十</option>    
+                    <option value="Nov">十一</option>
+                    <option value="Dec">十二</option>
+                </select>
+                <b>日:</b>
+                <select name="spinner" id="day">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                    <option value="16">16</option>
+                    <option value="17">17</option>
+                    <option value="18">18</option>
+                    <option value="19">19</option>
+                    <option value="20">20</option>
+                    <option value="21">21</option> 
+                    <option value="22">22</option> 
+                    <option value="23">23</option>
+                    <option value="24">24</option>
+                    <option value="25">25</option> 
+                    <option value="26">26</option> 
+                    <option value="27">27</option>
+                    <option value="28">28</option>
+                    <option value="29">29</option> 
+                    <option value="30">30</option> 
+                    <option value="31">31</option>
+                </select>
+                <b>时间:</b>
+                <select name="spinner" id="hour">
+                    <option value="0">0</option> 
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                    <option value="16">16</option>
+                    <option value="17">17</option>
+                    <option value="18">18</option>
+                    <option value="19">19</option>
+                    <option value="20">20</option>
+                    <option value="21">21</option> 
+                    <option value="22">22</option> 
+                    <option value="23">23</option>
+                </select>
+                <br><br>
+                <button id="temperature_map">在图中显示</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <button id="rain_count"  onclick="pie();">生成统计饼状图</button>
+                <br><br>
+                &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button id="rain_bar">生成温度热力图</button>
+            </div>
+        </div>
+        <div id="dialog_table" title="Date List" style="font-size: 80%">
+            <div id="tabs">
+                <ul>
+                    <li><a href="#tabs-1">实时数据</a></li>
+                    <li><a href="#tabs-2">历史数据</a></li>
+                </ul>
+                <div id="tabs-1">
+                    <table id="users" class="ui-widget ui-widget-content">
+                        <thead>
+                            <tr class="ui-widget-header ">
+                                <th>显示</th>
+                                <th>名称</th>
+                                <th>温度</th>
+                                <th>低温</th>
+                                <th>高温</th>
+                                <th>天气</th>
+                                <th>风向</th>
+                                <th>风力</th>
+                                <th>湿度</th>
+                                <th>时间</th>
+                                <th>编辑</th>
+                            </tr>
+                        </thead>
+                        <tbody id="date_station_all">
+                            <tr>
+                                <td><input type="checkbox" id="date" value="无"/></td>
+                                <td>&nbsp无&nbsp</td>
+                                <td>&nbsp无&nbsp</td>
+                                <td>&nbsp无&nbsp</td>
+                                <td>&nbsp无&nbsp</td>
+                                <td>&nbsp无&nbsp</td>
+                                <td>&nbsp无&nbsp</td>
+                                <td>&nbsp无&nbsp</td>
+                                <td>&nbsp无&nbsp</td>
+                                <td>&nbsp无&nbsp</td>
+                                <td><input type="checkbox" value="无"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="tabs-2">
+                    <table id="users" class="ui-widget ui-widget-content">
+                        <thead>
+                            <tr class="ui-widget-header ">
+                        <h>地区:</h>
+                        <select name="spinner" id="city_table">
+                            <option value="湖南省">全部</option>
+                            <option value="长沙市">长沙</option>
+                            <option value="株洲市">株洲</option>
+                            <option value="湘潭市">湘潭</option>
+                            <option value="衡阳市">衡阳</option>
+                            <option value="邵阳市">邵阳</option>
+                            <option value="岳阳市">岳阳</option>
+                            <option value="常德市">常德</option>
+                            <option value="益阳市">益阳</option>
+                            <option value="郴州市">郴州</option>    
+                            <option value="永州市">永州</option>
+                            <option value="怀化市">怀化</option>
+                            <option value="娄底市">娄底</option>    
+                            <option value="湘西">湘西</option>
+                            <option value="张家界市">张家界</option>
+                        </select>
+                        <h>月份:</h>
+                        <select name="spinner" id="month_table">
+                            <option value="Jan">一</option>
+                            <option value="Feb">二</option>
+                            <option value="Mar">三</option>
+                            <option value="Apr">四</option>
+                            <option value="May">五</option>
+                            <option value="Jun">六</option>
+                            <option value="Jul">七</option>
+                            <option value="Aug">八</option>
+                            <option value="Sep">九</option>
+                            <option value="Oct">十</option>    
+                            <option value="Nov">十一</option>
+                            <option value="Dec">十二</option>
+                        </select>
+                        <h>日期:</h>
+                        <select name="spinner" id="day_table">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                            <option value="19">19</option>
+                            <option value="20">20</option>
+                            <option value="21">21</option> 
+                            <option value="22">22</option> 
+                            <option value="23">23</option>
+                            <option value="24">24</option>
+                            <option value="25">25</option> 
+                            <option value="26">26</option> 
+                            <option value="27">27</option>
+                            <option value="28">28</option>
+                            <option value="29">29</option> 
+                            <option value="30">30</option> 
+                            <option value="31">31</option>
+                        </select>
+                        <h>时间:</h>
+                        <select name="spinner" id="hour_table">
+                            <option value="0">0</option> 
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                            <option value="19">19</option>
+                            <option value="20">20</option>
+                            <option value="21">21</option> 
+                            <option value="22">22</option> 
+                            <option value="23">23</option>
+                        </select>
+                        <button onclick="_update_station_hostory()">查询</button>
+                        <th>名称</th>
+                        <th>温度</th>
+                        <th>风向</th>
+                        <th>风力</th>
+                        <th>湿度</th>
+                        <th>时间</th>
+                        <th>编辑</th>
+                        </tr>
+                        </thead>
+                        <tbody id="date_county_list">
+                            <tr>
+                                <td>&nbsp无&nbsp</td>
+                                <td>&nbsp无&nbsp</td>
+                                <td>&nbsp无&nbsp</td>
+                                <td>&nbsp无&nbsp</td>
+                                <td>&nbsp无&nbsp</td>
+                                <td>&nbsp无&nbsp</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="menu">
+            <input type="radio" id="radio1" name="radio"><label for="radio1">专题图浏览</label>
+            <input type="radio" id="radio2" name="radio"><label for="radio2">列表数据</label>
+            <input type="radio" id="radio3" name="radio"><label for="radio3">温度走势图</label>
+            <input type="radio" id="radio4" name="radio"><label for="radio4">气温监测</label>
+            <input type="radio" id="radio5" name="radio"><label for="radio5">图层查询工具</label>
+        </div>
+        <div id="dialog_select" title="查询工具">
+            <button id = "select_bounds">视野内搜索</button>
+            <button id = "select_box">拉框查询</button>
+            <button id = "select_polygon">多边形查询</button>
+            <button id = "select_name">名称查询</button>
+        </div>
+        <div id="dialog_table_station" title="Date List">
+            <table id="users" class="ui-widget ui-widget-content">
+                <thead>
+                    <tr class="ui-widget-header ">
+                        <th>显示</th>
+                        <th>名称</th>
+                        <th>温度</th>
+                        <th>低温</th>
+                        <th>高温</th>
+                        <th>天气</th>
+                        <th>风向</th>
+                        <th>风力</th>
+                        <th>湿度</th>
+                        <th>时间</th>
+                    </tr>
+                </thead>
+                <tbody id="date_station_list">
+                    <tr>
+                        <td><input type="checkbox" id="date" value="无"/></td>
+                        <td>&nbsp无&nbsp</td>
+                        <td>&nbsp无&nbsp</td>
+                        <td>&nbsp无&nbsp</td>
+                        <td>&nbsp无&nbsp</td>
+                        <td>&nbsp无&nbsp</td>
+                        <td>&nbsp无&nbsp</td>
+                        <td>&nbsp无&nbsp</td>
+                        <td>&nbsp无&nbsp</td>
+                        <td>&nbsp无&nbsp</td>
+                        <td>&nbsp无&nbsp</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id ="dialog_chart" title="气温走势图">
+            <div id="graph">Loading graph...</div>
+        </div>
+        <div id ="dialog_chart_all" title="气温走势图">
+            <b>选择市:</b>
+            <select name="spinner" id="city">
+                <option value="长沙市">长沙市</option>
+                <option value="株洲市">株洲市</option>
+                <option value="湘潭市">湘潭市</option>
+                <option value="衡阳市">衡阳市</option>
+                <option value="邵阳市">邵阳市</option>
+                <option value="岳阳市">岳阳市</option>
+                <option value="常德市">常德市</option>
+                <option value="张家界市">张家界市</option>
+                <option value="益阳市">益阳市</option>    
+                <option value="郴州市">郴州市</option>
+                <option value="永州市">永州市</option>
+                <option value="怀化市">怀化市</option>
+                <option value="娄底市">娄底市</option>
+                <option value="湘西">湘西</option>
+                <option value="空">----</option>
+            </select>
+            <b>选择县:</b>
+            <select name="spinner" id="country">
+                <option value='长沙'>长沙市市辖区</option>
+                <option value='望城'>望城县</option>
+                <option value='宁乡'>宁乡县</option>
+                <option value='浏阳'>浏阳市</option>
+            </select>
+            <b>起始:</b>
+            <select name="spinner" id="month_charts">
+                <option value="Jan">一</option>
+                <option value="Feb">二</option>
+                <option value="Mar">三</option>
+                <option value="Apr">四</option>
+                <option value="May">五</option>
+                <option value="Jun">六</option>
+                <option value="Jul">七</option>
+                <option value="Aug">八</option>
+                <option value="Sep">九</option>
+                <option value="Oct">十</option>    
+                <option value="Nov">十一</option>
+                <option value="Dec">十二</option>
+            </select>月
+            <select name="spinner" id="day_start">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option> 
+                <option value="22">22</option> 
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option> 
+                <option value="26">26</option> 
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option> 
+                <option value="30">30</option> 
+                <option value="31">31</option>
+            </select>号
+            <b>终止:</b>
+            <select name="spinner" id="day_end">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option> 
+                <option value="22">22</option> 
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option> 
+                <option value="26">26</option> 
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option> 
+                <option value="30">30</option> 
+                <option value="31">31</option>
+            </select>号
+            &nbsp &nbsp<button onclick="_getvalue();">显示走势图</button>
+            <div id="graph_single">Loading graph...</div>
+        </div>
+        <div id="picture">
+            <button id="original" value="0">原图数据图</button><br>
+            <button id="level" value="1">天气分布图</button><br>
+            <button id="rain" value="2">气温热力图</button>
+        </div>
+        <div id="login">
+            <button id="login_button">管理员登陆</button>
+        </div>
+        <div id="login_dialog" title="登录">
+            <b><i>User:</i></b>
+            <input type="text" id="username"/>
+            <br>
+            <b><i>Pwd:</i></b>
+            <input type="password" id="password"/>
+            <br><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button onclick="login()">登录</button>
+            &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
+            <button onclick="clean()">重置</button>
+        </div>
+        <div id="exit">
+            <button onclick="exit()">退出</button><button id="tools">工具箱</button>
+        </div>
+        <div id="tools_dialog" title="tools">
+            <button onclick="start()">启动获取数据服务</button>
+            <button onclick="end()">停止获取数据服务</button>
+        </div>
+        <div id ="dynamic" title="气温热力图">
+            <h>选择月份:</h>
+            <select name="spinner" id="dynamic_month">
+                <option value="Jan">一</option>
+                <option value="Feb">二</option>
+                <option value="Mar">三</option>
+                <option value="Apr">四</option>
+                <option value="May">五</option>
+                <option value="Jun">六</option>
+                <option value="Jul">七</option>
+                <option value="Aug">八</option>
+                <option value="Sep">九</option>
+                <option value="Oct">十</option>    
+                <option value="Nov">十一</option>
+                <option value="Dec">十二</option>
+            </select>
+            &nbsp;&nbsp;间隔(ms)：<input id="time" type="input" value="1000" style="width:40px;"/>
+            <br>
+            起始时间：
+            <h>日期:</h>
+            <select name="spinner" id="dynamic_day_start">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option> 
+                <option value="22">22</option> 
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option> 
+                <option value="26">26</option> 
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option> 
+                <option value="30">30</option> 
+                <option value="31">31</option>
+            </select>&nbsp;&nbsp;
+            <h>时间:</h>
+            <select name="spinner" id="dynamic_hour_start">
+                <option value="0">0</option> 
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option> 
+                <option value="22">22</option> 
+                <option value="23">23</option>
+            </select>
+            <br>
+            结束时间：
+            <h>日期:</h>
+            <select name="spinner" id="dynamic_day_end">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option> 
+                <option value="22">22</option> 
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option> 
+                <option value="26">26</option> 
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option> 
+                <option value="30">30</option> 
+                <option value="31">31</option>
+            </select>&nbsp;&nbsp;
+            <h>时间:</h>
+            <select name="spinner" id="dynamic_hour_end">
+                <option value="0">0</option> 
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option> 
+                <option value="22">22</option> 
+                <option value="23">23</option>
+            </select>
+            <br><br>
+            &nbsp; &nbsp;
+            <button id="start_dynamic" onclick="dynamic_start();">开始播放</button>
+            &nbsp; &nbsp; &nbsp; &nbsp;
+            <button id="end_dynamic" onclick="dynamic_end();">停止播放</button>
+        </div>
+        <div id="bar">
+            <img src="IMG/ToolBar/1.png" onclick="bar(1);">
+            <img src="IMG/ToolBar/2.png" onclick="bar(2);">
+            <img src="IMG/ToolBar/3.png" onclick="bar(3);">
+            <img src="IMG/ToolBar/4.png" onclick="bar(4);">
+            <img src="IMG/ToolBar/5.png" onclick="bar(5);">
+        </div>
+        <div id="admin_data" title="修改信息">
+            名称： <input type="text" id="admin_name"/><br>
+            温度： <input type="text" id="admin_temp"/><br>
+            低温： <input type="text" id="admin_min"/><br>
+            高温： <input type="text" id="admin_max"/><br>
+            天气： <input type="text" id="admin_weather"/><br>
+            风向： <input type="text" id="admin_wd"/><br>
+            风力： <input type="text" id="admin_ws"/><br>
+            湿度： <input type="text" id="admin_sd"/><br>
+            <button id="admin_change" onclick="change_data();">修改</button>
+        </div>
+        <div id="admin_history" title="修改信息">
+            名称： <input type="text" id="admin_history_name"/><br>
+            温度： <input type="text" id="admin_history_temp"/><br>
+            风向： <input type="text" id="admin_history_wd"/><br>
+            风力： <input type="text" id="admin_history_ws"/><br>
+            湿度： <input type="text" id="admin_history_sd"/><br>
+            <button id="admin_history_change" onclick="change_history_data();">修改</button>
+        </div>
+        <div id="search_dialog" title="名称查询">
+            名称： <input type="text" id="serach_name"/>
+            <button onclick="search_name();">查询</button>
+        </div>
+        <div id="temp_pie" title="温度统计图"></div>
+    </body>
+</html>
